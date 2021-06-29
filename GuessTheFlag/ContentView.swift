@@ -8,19 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showingAlert = false
+
     var body: some View {
-        VStack(spacing: 20) {
-            ForEach(0 ..< 3) { row in
-                HStack(spacing: 20) {
-                    Text("1")
-                    Text("2")
-                    Text("3")
-                }
-            }
+        Button("Show Alert") {
+            self.showingAlert = true
+        }
+        .alert(isPresented: $showingAlert) {
+            Alert(title: Text("Hello SwiftUI!"), message: Text("This is some detail message"), dismissButton: .default(Text("OK")))
         }
     }
 }
-
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
