@@ -8,15 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var showingScore = false
-    @State private var scoreTitle = ""
-    
-    //get a shuffled array back
+    @State private var gameModel: GameModel =
+        GameModel(scoreTitle: "New Game", message: "Would you like to start a new game?", score: 0, showingScore: true)
+    @State private var correctAnswer = Int.random(in: 0...2)
     @State private var countries =
         ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"]
         .shuffled()
-    
-    @State private var correctAnswer = Int.random(in: 0...2)
 
     var body: some View {
         ZStack {
@@ -34,6 +31,7 @@ struct ContentView: View {
                 ForEach(0 ..< 3) { number in
                     Button(action: {
                         self.flagTapped(number)
+                        self.askQuestion()
                     }) {
                         Image(self.countries[number])
                             .renderingMode(.original)
@@ -43,22 +41,31 @@ struct ContentView: View {
                     }
                 }
                 Spacer()
+                Text("Current score: \(gameModel.score)")
+                    .font(.title)
+                    .foregroundColor(.white)
             }
         }
-        .alert(isPresented: $showingScore, content: {
-            Alert(title: Text(scoreTitle), message: Text("Your score is ???"), dismissButton: .default(Text("Continue")) {
+        .alert(isPresented: $gameModel.showingScore, content: {
+            Alert(title: Text(gameModel.scoreTitle), message: Text(gameModel.message), dismissButton: .default(Text("Continue")) {
                 self.askQuestion()
             })
         })
+        .statusBar(hidden: true)
     }
     
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
-            scoreTitle = "Correct"
+            gameModel.scoreTitle = "Correct"
+            gameModel.message = "Your score is \(gameModel.score)"
+            gameModel.score += 1
         } else {
-            scoreTitle = "Wrong"
+            gameModel.showingScore = true
+            gameModel.score = 0
+            gameModel.message = "The flag you tapped is: \(countries[number])"
+            gameModel.scoreTitle = "Incorrect"
         }
-        showingScore = true
+        
     }
     
     func askQuestion() {
